@@ -8,26 +8,9 @@
 
 import UIKit
 
-class ViewController: UIViewController, CLLocationManagerDelegate {
+class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate {
     let apiKey = "AIzaSyBIGNgs-QTIXWdvFRgWp4KVhqYbLtS-5zE"
     let locationManager = CLLocationManager()
-    
-    var rect = GMSMutablePath()
-
-    
-//    GMSMutablePath *rect = [GMSMutablePath path];
-//    [rect addCoordinate:CLLocationCoordinate2DMake(37.36, -122.0)];
-//    [rect addCoordinate:CLLocationCoordinate2DMake(37.45, -122.0)];
-//    [rect addCoordinate:CLLocationCoordinate2DMake(37.45, -122.2)];
-//    [rect addCoordinate:CLLocationCoordinate2DMake(37.36, -122.2)];
-//    
-//    // Create the polygon, and assign it to the map.
-//    GMSPolygon *polygon = [GMSPolygon polygonWithPath:rect];
-//    polygon.fillColor = [UIColor colorWithRed:0.25 green:0 blue:0 alpha:0.05];
-//    polygon.strokeColor = [UIColor blackColor];
-//    polygon.strokeWidth = 2;
-//    polygon.map = mapView_;
-//    
     
     
     @IBOutlet var mapView: GMSMapView!
@@ -39,12 +22,31 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             eventNameLabel.text = "hi!!"
             locationManager.delegate = self
             locationManager.requestWhenInUseAuthorization()
-        // Do any additional setup after loading the view, typically from a nib.
+  
+            mapView.delegate = self
     }
 
     @IBAction func clickPressed(sender: AnyObject) {
+        var firstCoord = CLLocationCoordinate2DMake(37.78705,-122.409188)
+        var secCoord = CLLocationCoordinate2DMake(37.785901,-122.411334)
+        var thirdCoord = CLLocationCoordinate2DMake(37.782291,-122.408976)
+        var fourthCoord = CLLocationCoordinate2DMake(37.785505,-122.405334)
         
-        NSLog("button pressed")
+        var rect = GMSMutablePath()
+        rect.insertCoordinate(firstCoord, atIndex: 0)
+        rect.insertCoordinate(secCoord, atIndex: 1)
+        rect.insertCoordinate(thirdCoord, atIndex: 2)
+        rect.insertCoordinate(fourthCoord, atIndex: 3)
+
+        NSLog("%@", rect)
+            
+       var polygon = GMSPolygon(path: rect)
+        polygon.strokeColor = UIColor .blackColor()
+        polygon.strokeWidth = 2
+        polygon.fillColor = UIColor .redColor()
+        polygon.map = self.mapView
+        
+        
     }
 
     func locationManager(manager: CLLocationManager!, didChangeAuthorizationStatus status: CLAuthorizationStatus) {

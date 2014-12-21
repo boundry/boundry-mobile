@@ -7,7 +7,6 @@
         <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
                 <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="boundry" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
@@ -48,10 +47,11 @@
                     <connections>
                         <outlet property="clickButton" destination="wVF-lC-vEM" id="qrg-K7-LLN"/>
                         <outlet property="coordLabel" destination="pNf-rh-Qwp" id="qJW-MA-4nR"/>
-                        <outlet property="eventNameLabel" destination="vOn-Sn-rbT" id="uqN-X2-tRf"/>
+                        <outlet property="eventNameLabel" destination="vOn-Sn-rbT" id="zrC-1z-ZNU"/>
                         <outlet property="mapView" destination="fTb-TE-k4v" id="3DZ-hA-W5K"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-617" y="-185"/>
         </scene>
