@@ -41,6 +41,15 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7ai-lw-dH6">
+                                <rect key="frame" x="319" y="105" width="136" height="30"/>
+                                <state key="normal" title="get Event Data">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="getEventDataPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dqd-2G-qw3"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -48,12 +57,13 @@
                         <outlet property="clickButton" destination="wVF-lC-vEM" id="qrg-K7-LLN"/>
                         <outlet property="coordLabel" destination="pNf-rh-Qwp" id="qJW-MA-4nR"/>
                         <outlet property="eventNameLabel" destination="vOn-Sn-rbT" id="zrC-1z-ZNU"/>
+                        <outlet property="getEventButton" destination="7ai-lw-dH6" id="lfc-y2-wwh"/>
                         <outlet property="mapView" destination="fTb-TE-k4v" id="3DZ-hA-W5K"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-617" y="-185"/>
+            <point key="canvasLocation" x="-431" y="-496"/>
         </scene>
     </scenes>
 </document>
