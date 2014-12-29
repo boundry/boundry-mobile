@@ -12,6 +12,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     let apiKey = "AIzaSyBIGNgs-QTIXWdvFRgWp4KVhqYbLtS-5zE"
     let locationManager = CLLocationManager()
     
+
+//    [{"eventName":"sampleEvent","regions":[{"regionName":"sampleRegion","coordinates":[[37.78705,-122.409188],[37.785901,-122.411334],[37.782291,-122.408976],[37.785505,-122.405334]]}]}]
+    
     
     @IBOutlet var mapView: GMSMapView!
     @IBOutlet var clickButton: UIButton!
@@ -38,15 +41,48 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         rect.insertCoordinate(thirdCoord, atIndex: 2)
         rect.insertCoordinate(fourthCoord, atIndex: 3)
 
+        
+        var currentLoc = CLLocationCoordinate2D(latitude: locationManager.location.coordinate.latitude, longitude: locationManager.location.coordinate.longitude)
+        
+        //checks if current loc is in boundary
+        if GMSGeometryContainsLocation(currentLoc, rect, true) {
+            NSLog("in here")
+        } else {
+            NSLog("not in here")
+        }
+        
         NSLog("%@", rect)
             
        var polygon = GMSPolygon(path: rect)
-        polygon.strokeColor = UIColor .blackColor()
+        polygon.strokeColor = UIColor.blackColor()
         polygon.strokeWidth = 2
-        polygon.fillColor = UIColor .redColor()
+        polygon.fillColor = UIColor.redColor().colorWithAlphaComponent(0.3)
         polygon.map = self.mapView
+        polygon.title = "Concert"
+        polygon.tappable = true
         
+        //if user in boundary, make label say in boundary name
+        checkUserInBoundary()
+    }
+    
+    func mapView(mapView: GMSMapView!, didTapOverlay overlay: GMSOverlay!) {
+        var obj = overlay
+        NSLog("%@", obj.title)
+        var position = CLLocationCoordinate2DMake(locationManager.location.coordinate.latitude,locationManager.location.coordinate.longitude);
+        var locMarker = GMSMarker(position: position)
+        locMarker.title = obj.title
+        locMarker.map = mapView
         
+    }
+    
+    
+    //checks if in any of the boundaries
+    func checkUserInBoundary() {
+//        NSLog("hi")
+        var latValue = locationManager.location.coordinate.latitude
+        var lonValue = locationManager.location.coordinate.longitude
+//        NSLog("%f, %f", latValue, lonValue)
+    
     }
 
     func locationManager(manager: CLLocationManager!, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
@@ -62,7 +98,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
         if let location = locations.first as? CLLocation {
-                    NSLog("%f, %f", locationManager.location.coordinate.longitude, locationManager.location.coordinate.latitude)
+//                    NSLog("%f, %f", locationManager.location.coordinate.longitude, locationManager.location.coordinate.latitude)
             var latValue = locationManager.location.coordinate.latitude
             var lonValue = locationManager.location.coordinate.longitude
             
@@ -71,7 +107,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
             coordLabel.text = lat + " " + lng
             
             mapView.camera = GMSCameraPosition(target: location.coordinate, zoom: 15, bearing: 0, viewingAngle: 0)
-    
+            
+            //will continually get location unless have this line
             locationManager.stopUpdatingLocation()
         }
     }
