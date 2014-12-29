@@ -13,6 +13,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     let locationManager = CLLocationManager()
     
     
+    @IBOutlet var getEventButton: UIButton!
     @IBOutlet var mapView: GMSMapView!
     @IBOutlet var clickButton: UIButton!
     @IBOutlet var eventNameLabel: UILabel!
@@ -26,6 +27,25 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
             mapView.delegate = self
     }
 
+    @IBAction func getEventDataPressed(sender: AnyObject) {
+//        NSString *dataUrl = @"http://boundry.herokuapp.com/api/mobile/events";
+//        NSURL *url = [NSURL URLWithString:dataUrl];
+//        
+//        NSURLSessionDataTask *downloadTask = [[NSURLSession sharedSession]
+//        dataTaskWithURL:url completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+//        NSLog(data);
+//        }];
+//        
+//        [downloadTask resume];
+        let url = NSURL(string: "http://boundry.herokuapp.com/api/mobile/events")
+        
+        let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in println(NSString(data: data, encoding: NSUTF8StringEncoding))
+        }
+        
+        task.resume()
+        
+    }
+    
     @IBAction func clickPressed(sender: AnyObject) {
         var firstCoord = CLLocationCoordinate2DMake(37.78705,-122.409188)
         var secCoord = CLLocationCoordinate2DMake(37.785901,-122.411334)
