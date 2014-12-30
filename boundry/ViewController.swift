@@ -14,21 +14,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     
     @IBOutlet var getEventButton: UIButton!
     @IBOutlet var mapView: GMSMapView!
-    @IBOutlet var clickButton: UIButton!
     @IBOutlet var eventNameLabel: UILabel!
     @IBOutlet var regionNameLabel: UILabel!
     @IBOutlet var coordLabel: UILabel!
     override func viewDidLoad() {
         super.viewDidLoad()
-            eventNameLabel.text = "hi!!"
-            locationManager.delegate = self
-            locationManager.requestWhenInUseAuthorization()
-  
-            mapView.delegate = self
+//        eventNameLabel.text = "hi!!"
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        mapView.delegate = self
     }
 
+    //get api event info and show regions on view
     @IBAction func getEventDataPressed(sender: AnyObject) {
-        
         let url = NSURL(string: "http://boundry.herokuapp.com/api/mobile/events")
         
         let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
@@ -38,12 +36,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
             let parsedObject: AnyObject! = NSJSONSerialization.JSONObjectWithData(data,
                 options: NSJSONReadingOptions.MutableContainers,
                 error:&parseError)
-          
-//            println(parsedObject)
 
             if let event = parsedObject[0] as? NSDictionary {
                 if let eventName = event["eventName"] as? NSString {
-//                    println(eventName)
+                    println(eventName)
+//                    self.eventNameLabel.text = eventName
                     if let regions = event["regions"] as? NSArray {
                         //for every region, show region on map
                         for region in regions {
@@ -52,32 +49,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                                 var allCoord = region.objectForKey("coordinates") as NSArray!
                                 //displays region on map
                                 dispatch_async(dispatch_get_main_queue(), {
+                                    self.eventNameLabel.text = eventName
                                     self.showRegion(allCoord, regName: regionName)
                                 })
-//                                //individual coord for region
-//                                for coord in allCoord {
-//                                    println(coord)
-//                                }
-//                            println(region["coordinates"])
-//                            showRegion(region)
                             }
                         }
-                        
-//                        println(regions["regionName"])
-//                        if let regionName = event.valueForKey("regionName") as? NSString {
-//                                println(regionName)
-//                            
-//                        }
-//                        println(regions[0])
-                        
                     }
-                    
                 }
             }
         }
         task.resume()
     }
     
+    //take coord array and create GMSPolygons on map
     func showRegion(regionCoordArray: NSArray, regName: NSString) {
         var regionPath = GMSMutablePath()
         var ind:UInt = 0
@@ -101,49 +85,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         polygon.tappable = true
         
     }
-    @IBAction func clickPressed(sender: AnyObject) {
-        var firstCoord = CLLocationCoordinate2DMake(37.78705,-122.409188)
-        var secCoord = CLLocationCoordinate2DMake(37.785901,-122.411334)
-        var thirdCoord = CLLocationCoordinate2DMake(37.782291,-122.408976)
-        var fourthCoord = CLLocationCoordinate2DMake(37.785505,-122.405334)
-        
-        var rect = GMSMutablePath()
-        rect.insertCoordinate(firstCoord, atIndex: 0)
-        rect.insertCoordinate(secCoord, atIndex: 1)
-        rect.insertCoordinate(thirdCoord, atIndex: 2)
-        rect.insertCoordinate(fourthCoord, atIndex: 3)
-
-        
-        var currentLoc = CLLocationCoordinate2D(latitude: locationManager.location.coordinate.latitude, longitude: locationManager.location.coordinate.longitude)
-        
-        //checks if current loc is in boundary
-        if GMSGeometryContainsLocation(currentLoc, rect, true) {
-            println("in here")
-        } else {
-            println("not in here")
-        }
-        
-//        println(rect)
-        
-//       var polygon = GMSPolygon(path: rect)
-//        polygon.strokeColor = UIColor.blackColor()
-//        polygon.strokeWidth = 2
-//        polygon.fillColor = UIColor.redColor().colorWithAlphaComponent(0.3)
-//        polygon.map = self.mapView
-//        polygon.title = "Concert"
-//        polygon.tappable = true
-        
-        //if user in boundary, make label say in boundary name
-//        checkUserInBoundary()
-    }
     
+    //on tap of overlay, show region on label
     func mapView(mapView: GMSMapView!, didTapOverlay overlay: GMSOverlay!) {
         var obj = overlay
         regionNameLabel.text = obj.title
     }
 
     
-    //checks if in any of the boundaries
+    //checks if user in any of the boundaries. updates label
     func checkUserInBoundary(region: GMSMutablePath, regName: NSString) {
         
         
@@ -157,8 +107,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         } else {
             println("not in here")
         }
-       
-//        NSLog("%f, %f", latValue, lonValue)
     
     }
 
