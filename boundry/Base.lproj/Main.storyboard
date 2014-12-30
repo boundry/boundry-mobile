@@ -42,7 +42,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7ai-lw-dH6">
-                                <rect key="frame" x="319" y="105" width="136" height="30"/>
+                                <rect key="frame" x="109" y="113" width="136" height="30"/>
                                 <state key="normal" title="get Event Data">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -50,6 +50,12 @@
                                     <action selector="getEventDataPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dqd-2G-qw3"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="regionName" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Oc-Wl-NrN">
+                                <rect key="frame" x="104" y="474" width="317" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -59,6 +65,7 @@
                         <outlet property="eventNameLabel" destination="vOn-Sn-rbT" id="zrC-1z-ZNU"/>
                         <outlet property="getEventButton" destination="7ai-lw-dH6" id="lfc-y2-wwh"/>
                         <outlet property="mapView" destination="fTb-TE-k4v" id="3DZ-hA-W5K"/>
+                        <outlet property="regionNameLabel" destination="7Oc-Wl-NrN" id="e5Z-AK-idG"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
