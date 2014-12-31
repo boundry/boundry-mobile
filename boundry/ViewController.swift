@@ -12,6 +12,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     let apiKey = "AIzaSyBIGNgs-QTIXWdvFRgWp4KVhqYbLtS-5zE"
     let locationManager = CLLocationManager()
     
+    
+    var regionDict = Dictionary<String, Bool>()
+    var regionPathDict = Dictionary<String, GMSMutablePath>()
+    var currentRegionIn = ""
+    
     @IBOutlet var getEventButton: UIButton!
     @IBOutlet var mapView: GMSMapView!
     @IBOutlet var eventNameLabel: UILabel!
@@ -20,6 +25,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     override func viewDidLoad() {
         super.viewDidLoad()
 //        eventNameLabel.text = "hi!!"
+        var timer = NSTimer.scheduledTimerWithTimeInterval(2, target: self, selector: Selector("checkCurrentRegionIn"), userInfo: nil, repeats: true)
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
         mapView.delegate = self
@@ -27,6 +33,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
 
     //get api event info and show regions on view
     @IBAction func getEventDataPressed(sender: AnyObject) {
+//        set timeout
+//        let delayTime = 2 * Double(NSEC_PER_SEC)
+//        let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delayTime))
+//        dispatch_after(time, dispatch_get_main_queue()) { () -> Void in
+//            println("hi")
+//        }
+        
         let url = NSURL(string: "http://boundry.herokuapp.com/api/mobile/events")
         
         let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
@@ -45,7 +58,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                         //for every region, show region on map
                         for region in regions {
                             if let regionName = region.valueForKey("regionName") as NSString! {
+                                self.regionDict[regionName] = false
 //                                println(regionName)
+//                                println(self.regionDict)
                                 var allCoord = region.objectForKey("coordinates") as NSArray!
                                 //displays region on map
                                 dispatch_async(dispatch_get_main_queue(), {
@@ -61,6 +76,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         task.resume()
     }
     
+    
     //take coord array and create GMSPolygons on map
     func showRegion(regionCoordArray: NSArray, regName: NSString) {
         var regionPath = GMSMutablePath()
@@ -74,6 +90,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
             regionPath.insertCoordinate(theCoord, atIndex: ind)
             ind++
         }
+        
+        self.regionPathDict[regName] = regionPath
+//        println(regionPathDict)
+        
         checkUserInBoundary(regionPath, regName: regName)
         
         var polygon = GMSPolygon(path: regionPath)
@@ -92,6 +112,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         regionNameLabel.text = obj.title
     }
 
+    //check which region the user is in
+    func checkCurrentRegionIn() {
+        for (regName, regionPath) in regionPathDict {
+            checkUserInBoundary(regionPath, regName: regName)
+        }
+    //go through all regions and do the checkUserInBoundary
+        //if diff switch true and false and then do get request to server
+    }
     
     //checks if user in any of the boundaries. updates label
     func checkUserInBoundary(region: GMSMutablePath, regName: NSString) {
@@ -103,11 +131,53 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         //checks if current loc is in boundary
         if GMSGeometryContainsLocation(locationManager.location.coordinate, region, true) {
             coordLabel.text = "You are in: " + regName
+            //if false, switch to true and change the previous true to false
+            //reassign currentRegionIn
+            if regionDict[regName]! == false {
+                regionDict[regName] = true
+                if currentRegionIn != "" {
+                    regionDict[currentRegionIn] = false
+                }
+                currentRegionIn = regName
+                //get notifications for (newly) entered region
+                var urlString = "http://boundry.herokuapp.com/api/mobile/actions/" + regName
+                println(urlString)
+                let url = NSURL(string: urlString)
+                
+                let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
+                    
+                    var parseError: NSError?
+                    //AnyObject! gets rid of the Optional Wrapping
+                    let parsedObject: AnyObject! = NSJSONSerialization.JSONObjectWithData(data,
+                        options: NSJSONReadingOptions.MutableContainers,
+                        error:&parseError)
+                    
+                    if let notification = parsedObject[0] as? NSString {
+                        println(notification)
+                        var alert = UIAlertController(title: "Alert", message: notification, preferredStyle: UIAlertControllerStyle.Alert)
+                        alert.addAction(UIAlertAction(title: "Okay!", style: UIAlertActionStyle.Default, handler: nil))
+                        self.presentViewController(alert, animated: true, completion: nil)
+                    }
+                    
+//                    if let notifications = parsedObject[0] as? NSArray {
+//                        println(notifcations)
+//                        for notification in notifications {
+//                            println(notification)
+//                            if let notification = notification as? NSString {
+//                                println(notification)
+//                                var alert = UIAlertController(title: "Alert", message: notification, preferredStyle: UIAlertControllerStyle.Alert)
+//                                alert.addAction(UIAlertAction(title: "Okay!", style: UIAlertActionStyle.Default, handler: nil))
+//                                self.presentViewController(alert, animated: true, completion: nil)
+//                            }
+//                        }
+//                    }
+                }
+                task.resume()
+            }
             println("in here")
         } else {
             println("not in here")
         }
-    
     }
 
     func locationManager(manager: CLLocationManager!, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
