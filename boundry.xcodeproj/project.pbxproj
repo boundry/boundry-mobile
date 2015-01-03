@@ -29,6 +29,7 @@
 		6289EC171A44F3B600151FBF /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6289EBED1A44F30D00151FBF /* AVFoundation.framework */; };
 		6289EC2A1A44F94E00151FBF /* objcFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 6289EC291A44F94E00151FBF /* objcFile.m */; };
 		6289EC2C1A44FBD100151FBF /* GoogleMaps.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6289EC2B1A44FBD100151FBF /* GoogleMaps.bundle */; };
+		FC9F5BC61A54F95C00907C84 /* EventTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC9F5BC51A54F95C00907C84 /* EventTableViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,6 +100,7 @@
 		6289EC281A44F94D00151FBF /* boundry-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "boundry-Bridging-Header.h"; sourceTree = SOURCE_ROOT; };
 		6289EC291A44F94E00151FBF /* objcFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = objcFile.m; path = boundry/objcFile.m; sourceTree = "<group>"; };
 		6289EC2B1A44FBD100151FBF /* GoogleMaps.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = GoogleMaps.bundle; path = GoogleMaps.framework/Versions/A/Resources/GoogleMaps.bundle; sourceTree = "<group>"; };
+		FC9F5BC51A54F95C00907C84 /* EventTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventTableViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -158,6 +160,7 @@
 			children = (
 				6289EA951A44E42300151FBF /* AppDelegate.swift */,
 				6289EA9A1A44E42300151FBF /* ViewController.swift */,
+				FC9F5BC51A54F95C00907C84 /* EventTableViewController.swift */,
 				6289EA9C1A44E42300151FBF /* Main.storyboard */,
 				6289EA9F1A44E42300151FBF /* Images.xcassets */,
 				6289EAA11A44E42300151FBF /* LaunchScreen.xib */,
@@ -398,6 +401,7 @@
 				6289EA9B1A44E42300151FBF /* ViewController.swift in Sources */,
 				6289EA961A44E42300151FBF /* AppDelegate.swift in Sources */,
 				6289EA991A44E42300151FBF /* boundry.xcdatamodeld in Sources */,
+				FC9F5BC61A54F95C00907C84 /* EventTableViewController.swift in Sources */,
 				6289EC2A1A44F94E00151FBF /* objcFile.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -613,6 +617,7 @@
 				6289EAB41A44E42300151FBF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6289EAB51A44E42300151FBF /* Build configuration list for PBXNativeTarget "boundryTests" */ = {
 			isa = XCConfigurationList;
@@ -621,6 +626,7 @@
 				6289EAB71A44E42300151FBF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
