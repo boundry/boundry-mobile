@@ -8,74 +8,70 @@
 
 import UIKit
 
-class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate {
+class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate {    
     let apiKey = "AIzaSyBIGNgs-QTIXWdvFRgWp4KVhqYbLtS-5zE"
     let locationManager = CLLocationManager()
     
+    // gets eventName from EventTableViewController
+    var eventName = ""
     
+    // generates uniqueId for each phone
+    let uniqueId = UIDevice.currentDevice().identifierForVendor.UUIDString
+    // store all of the region names and if the user is in that region
     var regionDict = Dictionary<String, Bool>()
+    // store all of the region paths to periodically check which path the user is in
     var regionPathDict = Dictionary<String, GMSMutablePath>()
     var currentRegionIn = ""
-    
+
     @IBOutlet var getEventButton: UIButton!
     @IBOutlet var mapView: GMSMapView!
     @IBOutlet var eventNameLabel: UILabel!
     @IBOutlet var regionNameLabel: UILabel!
     @IBOutlet var coordLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 //        eventNameLabel.text = "hi!!"
+        println(self.eventName)
         var timer = NSTimer.scheduledTimerWithTimeInterval(2, target: self, selector: Selector("checkCurrentRegionIn"), userInfo: nil, repeats: true)
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
         mapView.delegate = self
+        
+        getEventData(eventName)
     }
 
     //get api event info and show regions on view
-    @IBAction func getEventDataPressed(sender: AnyObject) {
-//        set timeout
-//        let delayTime = 2 * Double(NSEC_PER_SEC)
-//        let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delayTime))
-//        dispatch_after(time, dispatch_get_main_queue()) { () -> Void in
-//            println("hi")
-//        }
-        
-        let url = NSURL(string: "http://boundry.herokuapp.com/api/mobile/events")
-        
-        let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
-            
-            var parseError: NSError?
-            //AnyObject! gets rid of the Optional Wrapping
-            let parsedObject: AnyObject! = NSJSONSerialization.JSONObjectWithData(data,
-                options: NSJSONReadingOptions.MutableContainers,
-                error:&parseError)
-
-            if let event = parsedObject[0] as? NSDictionary {
-                if let eventName = event["eventName"] as? NSString {
-                    println(eventName)
-//                    self.eventNameLabel.text = eventName
-                    if let regions = event["regions"] as? NSArray {
-                        //for every region, show region on map
-                        for region in regions {
-                            if let regionName = region.valueForKey("regionName") as NSString! {
-                                self.regionDict[regionName] = false
-//                                println(regionName)
-//                                println(self.regionDict)
-                                var allCoord = region.objectForKey("coordinates") as NSArray!
-                                //displays region on map
-                                dispatch_async(dispatch_get_main_queue(), {
-                                    self.eventNameLabel.text = eventName
-                                    self.showRegion(allCoord, regName: regionName)
-                                })
+//    @IBAction func getEventDataPressed(sender: AnyObject) {
+//    }
+    
+    func getEventData(evName: String) {
+        if let cachedEventsData = NSUserDefaults().objectForKey("eventsData")! as? NSArray {
+            for event in cachedEventsData {
+                if let eventName = event["eventName"] as NSString! {
+                    if eventName == evName {
+                        println(eventName)
+                    
+                        if let regions = event["regions"] as? NSArray {
+                            //for every region, show region on map
+                            for region in regions {
+                                if let regionName = region.valueForKey("regionName") as NSString! {
+                                    self.regionDict[regionName] = false
+                                    var allCoord = region.objectForKey("coordinates") as NSArray!
+                                    //displays region on map
+                                    dispatch_async(dispatch_get_main_queue(), {
+                                        self.eventNameLabel.text = eventName
+                                        self.showRegion(allCoord, regName: regionName)
+                                    })
+                                }
                             }
                         }
+                        
                     }
                 }
             }
         }
-        task.resume()
     }
-    
     
     //take coord array and create GMSPolygons on map
     func showRegion(regionCoordArray: NSArray, regName: NSString) {
@@ -92,7 +88,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         }
         
         self.regionPathDict[regName] = regionPath
-//        println(regionPathDict)
         
         checkUserInBoundary(regionPath, regName: regName)
         
@@ -139,9 +134,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                     regionDict[currentRegionIn] = false
                 }
                 currentRegionIn = regName
-                //get notifications for (newly) entered region
+                //get notifications for (newly) entered region and shows notification
                 var urlString = "http://boundry.herokuapp.com/api/mobile/actions/" + regName
-                println(urlString)
                 let url = NSURL(string: urlString)
                 
                 let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
@@ -152,38 +146,20 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                         options: NSJSONReadingOptions.MutableContainers,
                         error:&parseError)
                     
+                    //show notification that comes in for the event
                     if let notification = parsedObject[0] as? NSString {
-                        println(notification)
                         var alert = UIAlertController(title: "Alert", message: notification, preferredStyle: UIAlertControllerStyle.Alert)
                         alert.addAction(UIAlertAction(title: "Okay!", style: UIAlertActionStyle.Default, handler: nil))
                         self.presentViewController(alert, animated: true, completion: nil)
                     }
-                    
-//                    if let notifications = parsedObject[0] as? NSArray {
-//                        println(notifcations)
-//                        for notification in notifications {
-//                            println(notification)
-//                            if let notification = notification as? NSString {
-//                                println(notification)
-//                                var alert = UIAlertController(title: "Alert", message: notification, preferredStyle: UIAlertControllerStyle.Alert)
-//                                alert.addAction(UIAlertAction(title: "Okay!", style: UIAlertActionStyle.Default, handler: nil))
-//                                self.presentViewController(alert, animated: true, completion: nil)
-//                            }
-//                        }
-//                    }
                 }
                 task.resume()
             }
-            println("in here")
-        } else {
-            println("not in here")
         }
     }
 
     func locationManager(manager: CLLocationManager!, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
-    
         if status == .AuthorizedWhenInUse {
-    
             locationManager.startUpdatingLocation()
             
             mapView.myLocationEnabled = true
@@ -213,3 +189,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     }
 
 }
+
+//        set timeout
+//        let delayTime = 2 * Double(NSEC_PER_SEC)
+//        let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delayTime))
+//        dispatch_after(time, dispatch_get_main_queue()) { () -> Void in
+//            println("hi")
+//        }
