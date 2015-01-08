@@ -23,7 +23,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     var regionPathDict = Dictionary<String, GMSMutablePath>()
     var currentRegionIn = ""
 
-    @IBOutlet var getEventButton: UIButton!
     @IBOutlet var mapView: GMSMapView!
     @IBOutlet var eventNameLabel: UILabel!
     @IBOutlet var regionNameLabel: UILabel!
@@ -119,9 +118,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     //checks if user in any of the boundaries. updates label
     func checkUserInBoundary(region: GMSMutablePath, regName: NSString) {
         
-        
-        var latValue = locationManager.location.coordinate.latitude
-        var lonValue = locationManager.location.coordinate.longitude
+        if let latValue = locationManager.location.coordinate.latitude as CLLocationDegrees? {
+            if let lonValue = locationManager.location.coordinate.longitude as CLLocationDegrees? {
+                println("setlatlon")
+            }
+        }
+//        var latValue = locationManager.location.coordinate.latitude
+//        var lonValue = locationManager.location.coordinate.longitude
         
         //checks if current loc is in boundary
         if GMSGeometryContainsLocation(locationManager.location.coordinate, region, true) {

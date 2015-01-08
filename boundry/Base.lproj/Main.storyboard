@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="kgi-yV-haA">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -16,44 +17,51 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fTb-TE-k4v" customClass="GMSMapView">
-                                <rect key="frame" x="27" y="208" width="300" height="239"/>
+                            <view contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fTb-TE-k4v" customClass="GMSMapView">
+                                <rect key="frame" x="27" y="208" width="283" height="239"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pNf-rh-Qwp">
-                                <rect key="frame" x="104" y="534" width="317" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" text="regionName" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Oc-Wl-NrN">
+                                <rect key="frame" x="43" y="462" width="317" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7ai-lw-dH6">
-                                <rect key="frame" x="109" y="113" width="136" height="30"/>
-                                <state key="normal" title="get Event Data">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="getEventDataPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dqd-2G-qw3"/>
-                                </connections>
-                            </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="regionName" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Oc-Wl-NrN">
-                                <rect key="frame" x="104" y="474" width="317" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" text="eventName" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vOn-Sn-rbT">
+                                <rect key="frame" x="71" y="84" width="261" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="IGC-bd-lZY"/>
+                                    <constraint firstAttribute="width" constant="261" id="oda-qn-2gA"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="eventName" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vOn-Sn-rbT">
-                                <rect key="frame" x="124" y="84" width="261" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pNf-rh-Qwp">
+                                <rect key="frame" x="43" y="504" width="317" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="centerX" secondItem="7Oc-Wl-NrN" secondAttribute="centerX" id="2zq-iV-bAN"/>
+                            <constraint firstAttribute="centerX" secondItem="fTb-TE-k4v" secondAttribute="centerX" id="8cY-3w-0Nv"/>
+                            <constraint firstItem="7Oc-Wl-NrN" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="32" id="9Kt-S5-Ltj"/>
+                            <constraint firstItem="fTb-TE-k4v" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="11" id="Bvu-TU-TXe"/>
+                            <constraint firstItem="pNf-rh-Qwp" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="32" id="OLZ-dj-71K"/>
+                            <constraint firstAttribute="centerX" secondItem="vOn-Sn-rbT" secondAttribute="centerX" id="XNW-X7-W2u"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="7Oc-Wl-NrN" secondAttribute="trailing" constant="219" id="fFD-ZN-nLH"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="pNf-rh-Qwp" secondAttribute="trailing" constant="219" id="jCf-Am-BZz"/>
+                            <constraint firstAttribute="centerX" secondItem="pNf-rh-Qwp" secondAttribute="centerX" id="ovy-x3-aam"/>
+                            <constraint firstAttribute="centerX" secondItem="fTb-TE-k4v" secondAttribute="centerX" id="qUt-5W-60y"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="fTb-TE-k4v" secondAttribute="trailing" constant="274" id="xdd-dm-gVi"/>
+                        </constraints>
                     </view>
                     <connections>
                         <outlet property="coordLabel" destination="pNf-rh-Qwp" id="qJW-MA-4nR"/>
                         <outlet property="eventNameLabel" destination="vOn-Sn-rbT" id="zrC-1z-ZNU"/>
-                        <outlet property="getEventButton" destination="7ai-lw-dH6" id="lfc-y2-wwh"/>
                         <outlet property="mapView" destination="fTb-TE-k4v" id="3DZ-hA-W5K"/>
                         <outlet property="regionNameLabel" destination="7Oc-Wl-NrN" id="e5Z-AK-idG"/>
                     </connections>
