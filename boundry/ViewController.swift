@@ -45,32 +45,62 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
 //    }
     
     func getEventData(evName: String) {
-        if let cachedEventsData = NSUserDefaults().objectForKey("eventsData")! as? NSArray {
-            for event in cachedEventsData {
-                if let eventName = event["eventName"] as NSString! {
+        if let events = NSUserDefaults().objectForKey("eventsData") as? [AnyObject] {
+            for event in events {
+                if let eventName = event["name"] as? NSString {
                     if eventName == evName {
-                        println(eventName)
-                    
-                        if let regions = event["regions"] as? NSArray {
-                            //for every region, show region on map
+                        if let regions = event["regions"] as? [AnyObject] {
                             for region in regions {
-                                if let regionName = region.valueForKey("regionName") as NSString! {
-                                    self.regionDict[regionName] = false
-                                    var allCoord = region.objectForKey("coordinates") as NSArray!
-                                    //displays region on map
-                                    dispatch_async(dispatch_get_main_queue(), {
-                                        self.eventNameLabel.text = eventName
-                                        self.showRegion(allCoord, regName: regionName)
-                                    })
+                                if let regionAttr = region["region_attr"] {
+                                    println(regionAttr)
+                                    //TRY TO GET COORDINATES OUT OF HERE
                                 }
                             }
                         }
-                        
                     }
                 }
             }
         }
     }
+//    func getEventData(evName: String) {
+//        if let cachedEventsData = NSUserDefaults().objectForKey("eventsData")! as? NSArray {
+//            for event in cachedEventsData {
+//                if let eventName = event["name"] as NSString! {
+//                    if eventName == evName {
+//                        println(eventName)
+//                    
+//                        if let regions = event["regions"] as? NSArray {
+//                            //for every region, show region on map
+//                            for region in regions {
+//                                if let regionName = region.valueForKey("region_name") as NSString! {
+//                                    if let regionAttr = region["region_attr"] as [String: AnyObject]! {
+//                                        println("sup")
+//                                        
+//                                        
+//                                        
+////                                        
+////                                        self.regionDict[regionName] = false
+////                                        var allCoord = regionAttr.valueForKey("coordinates") as? NSArray
+//////                                        println("ALLCOORD")
+////                                        println(allCoord)
+//////
+//////                                        println("REGION")
+//////                                        println(region)
+////                                        //displays region on map
+////                                        dispatch_async(dispatch_get_main_queue(), {
+////                                            self.eventNameLabel.text = eventName
+//////                                            self.showRegion(allCoord, regName: regionName)
+////                                        })
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        
+//                    }
+//                }
+//            }
+//        }
+//    }
     
     //take coord array and create GMSPolygons on map
     func showRegion(regionCoordArray: NSArray, regName: NSString) {
