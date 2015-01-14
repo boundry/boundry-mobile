@@ -45,11 +45,11 @@ class EventTableViewController: UITableViewController, UITableViewDelegate {
                 options: NSJSONReadingOptions.MutableContainers,
                 error:&parseError)
             
-            let eventsData = parsedObject as? NSArray
+            var eventsData = parsedObject as [AnyObject]
+            eventsData[0].setValue("", forKey: "event_center")
             
             NSUserDefaults.standardUserDefaults().setObject(eventsData, forKey: "eventsData")
             NSUserDefaults.standardUserDefaults().synchronize()
-//            println(NSUserDefaults().objectForKey("eventsData")!)
             
             self.updateEventsList()
         }

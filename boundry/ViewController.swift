@@ -19,6 +19,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     let uniqueId = UIDevice.currentDevice().identifierForVendor.UUIDString
     // store all of the region names and if the user is in that region
     var regionDict = Dictionary<String, Bool>()
+    var regions = Dictionary<String, AnyObject>()
     // store all of the region paths to periodically check which path the user is in
     var regionPathDict = Dictionary<String, GMSMutablePath>()
     var currentRegionIn = ""
@@ -30,8 +31,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        eventNameLabel.text = "hi!!"
-        println(self.eventName)
         var timer = NSTimer.scheduledTimerWithTimeInterval(2, target: self, selector: Selector("checkCurrentRegionIn"), userInfo: nil, repeats: true)
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
@@ -51,9 +50,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                     if eventName == evName {
                         if let regions = event["regions"] as? [AnyObject] {
                             for region in regions {
-                                if let regionAttr = region["region_attr"] {
-                                    println(regionAttr)
-                                    //TRY TO GET COORDINATES OUT OF HERE
+                                println("REGION")
+                                println(region)
+                                let regionName = region["region_name"] as NSString
+                                self.regionDict[regionName] = false
+                                
+                                if let regionAttr = region["region_attr"] as? [String: AnyObject]{
+                                    if let coordinates = regionAttr["coordinates"] as? [AnyObject] {
+                                        self.regions[regionName] = region
+                                        dispatch_async(dispatch_get_main_queue(), {
+                                            self.eventNameLabel.text = eventName
+                                            self.showRegion(coordinates, regName: regionName)
+                                        })
+                                    }
                                 }
                             }
                         }
@@ -62,45 +71,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
             }
         }
     }
-//    func getEventData(evName: String) {
-//        if let cachedEventsData = NSUserDefaults().objectForKey("eventsData")! as? NSArray {
-//            for event in cachedEventsData {
-//                if let eventName = event["name"] as NSString! {
-//                    if eventName == evName {
-//                        println(eventName)
-//                    
-//                        if let regions = event["regions"] as? NSArray {
-//                            //for every region, show region on map
-//                            for region in regions {
-//                                if let regionName = region.valueForKey("region_name") as NSString! {
-//                                    if let regionAttr = region["region_attr"] as [String: AnyObject]! {
-//                                        println("sup")
-//                                        
-//                                        
-//                                        
-////                                        
-////                                        self.regionDict[regionName] = false
-////                                        var allCoord = regionAttr.valueForKey("coordinates") as? NSArray
-//////                                        println("ALLCOORD")
-////                                        println(allCoord)
-//////
-//////                                        println("REGION")
-//////                                        println(region)
-////                                        //displays region on map
-////                                        dispatch_async(dispatch_get_main_queue(), {
-////                                            self.eventNameLabel.text = eventName
-//////                                            self.showRegion(allCoord, regName: regionName)
-////                                        })
-//                                    }
-//                                }
-//                            }
-//                        }
-//                        
-//                    }
-//                }
-//            }
-//        }
-//    }
     
     //take coord array and create GMSPolygons on map
     func showRegion(regionCoordArray: NSArray, regName: NSString) {
@@ -109,8 +79,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
 
         //set regionPath coordinates
         for coord in regionCoordArray {
-            var lat:CLLocationDegrees = coord[0] as CLLocationDegrees!
-            var lng:CLLocationDegrees = coord[1] as CLLocationDegrees!
+            var lat:CLLocationDegrees = coord["latitude"] as CLLocationDegrees!
+            var lng:CLLocationDegrees = coord["longitude"] as CLLocationDegrees!
             var theCoord = CLLocationCoordinate2DMake(lat, lng)
             regionPath.insertCoordinate(theCoord, atIndex: ind)
             ind++
@@ -127,7 +97,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         polygon.map = self.mapView
         polygon.title = regName
         polygon.tappable = true
-        
     }
     
     //on tap of overlay, show region on label
@@ -147,17 +116,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     
     //checks if user in any of the boundaries. updates label
     func checkUserInBoundary(region: GMSMutablePath, regName: NSString) {
-        
         if let latValue = locationManager.location.coordinate.latitude as CLLocationDegrees? {
             if let lonValue = locationManager.location.coordinate.longitude as CLLocationDegrees? {
                 println("setlatlon")
             }
         }
-//        var latValue = locationManager.location.coordinate.latitude
-//        var lonValue = locationManager.location.coordinate.longitude
+        var latValue = locationManager.location.coordinate.latitude
+        var lonValue = locationManager.location.coordinate.longitude
         
         //checks if current loc is in boundary
         if GMSGeometryContainsLocation(locationManager.location.coordinate, region, true) {
+            println("in here")
             coordLabel.text = "You are in: " + regName
             //if false, switch to true and change the previous true to false
             //reassign currentRegionIn
@@ -168,7 +137,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                 }
                 currentRegionIn = regName
                 //get notifications for (newly) entered region and shows notification
-                var urlString = "http://boundry.herokuapp.com/api/mobile/actions/" + regName
+//                var urlString = "http://boundry.herokuapp.com/api/mobile/actions/" + regName
+                println(regName)
+                var urlString = "http://localhost:8000/api/mobile/actions/" + "1"
                 let url = NSURL(string: urlString)
                 
                 let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
@@ -180,8 +151,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                         error:&parseError)
                     
                     //show notification that comes in for the event
-                    if let notification = parsedObject[0] as? NSString {
-                        var alert = UIAlertController(title: "Alert", message: notification, preferredStyle: UIAlertControllerStyle.Alert)
+                    if let notification = parsedObject[0] as? [String: AnyObject] {
+                        var alert = UIAlertController(title: notification["name"] as? String, message: notification["action_data"] as? String, preferredStyle: UIAlertControllerStyle.Alert)
                         alert.addAction(UIAlertAction(title: "Okay!", style: UIAlertActionStyle.Default, handler: nil))
                         self.presentViewController(alert, animated: true, completion: nil)
                     }
