@@ -20,7 +20,7 @@ import UIKit
 
 class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate {    
     let apiKey = "AIzaSyBIGNgs-QTIXWdvFRgWp4KVhqYbLtS-5zE"
-    let locationManager = CLLocationManager()
+    var locManager = CLLocationManager()
     
     // gets eventName from EventTableViewController
     var eventName = ""
@@ -42,16 +42,24 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     override func viewDidLoad() {
         super.viewDidLoad()
         var timer = NSTimer.scheduledTimerWithTimeInterval(2, target: self, selector: Selector("checkCurrentRegionIn"), userInfo: nil, repeats: true)
-        locationManager.delegate = self
-        locationManager.requestWhenInUseAuthorization()
+        locManager.delegate = self
+        locManager.requestWhenInUseAuthorization()
+        locManager.startUpdatingLocation()
         mapView.delegate = self
+        mapView.myLocationEnabled = true
+        mapView.settings.myLocationButton = true
         
-        getEventData(eventName)
+
+//        getEventData(eventName)
     }
 
     //get api event info and show regions on view
 //    @IBAction func getEventDataPressed(sender: AnyObject) {
 //    }
+    override func viewDidAppear(animated: Bool) {
+        println("viewdidappear")
+        getEventData(eventName)
+    }
     
     func getEventData(evName: String) {
         if let events = NSUserDefaults().objectForKey("eventsData") as? [AnyObject] {
@@ -66,8 +74,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                                 self.regionDict[regionName] = false
                                 if let regionAttr = region["region_attr"] as? [String: AnyObject]{
                                     if let coordinates = regionAttr["coordinates"] as? [AnyObject] {
+                                        println("CC",coordinates)
                                         self.regions[regionName] = region
                                         dispatch_async(dispatch_get_main_queue(), {
+                                            println("dispatch")
                                             self.eventNameLabel.text = eventName
                                             self.showRegion(coordinates, regName: regionName)
                                         })
@@ -97,6 +107,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         
         self.regionPathDict[regName] = regionPath
         
+        var test = locManager
+        NSLog("in here, %@", test)
         checkUserInBoundary(regionPath, regName: regName)
         
         var polygon = GMSPolygon(path: regionPath)
@@ -127,22 +139,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     //checks if user in any of the boundaries. updates label
     func checkUserInBoundary(region: GMSMutablePath, regName: NSString) {
         var regionId: String = ""
-        if let latValue = locationManager.location.coordinate.latitude as CLLocationDegrees? {
-            if let lonValue = locationManager.location.coordinate.longitude as CLLocationDegrees? {
+        if let latValue = locManager.location.coordinate.latitude as CLLocationDegrees? {
+            if let lonValue = locManager.location.coordinate.longitude as CLLocationDegrees? {
 //                println("setlatlon")
             }
         }
-        var latValue = locationManager.location.coordinate.latitude
-        var lonValue = locationManager.location.coordinate.longitude
+        var latValue = locManager.location.coordinate.latitude
+        var lonValue = locManager.location.coordinate.longitude
         for (regNa, regObj) in regions {
             if (regNa == regName) {
                 regionId = String(regObj["id"] as NSInteger!)
             }
-            
         }
         
         //checks if current loc is in boundary
-        if GMSGeometryContainsLocation(locationManager.location.coordinate, region, true) {
+        if GMSGeometryContainsLocation(locManager.location.coordinate, region, true) {
             coordLabel.text = "You are in: " + regName
             //if false, switch to true and change the previous true to false
             //reassign currentRegionIn
@@ -177,31 +188,42 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
             }
         }
     }
-
-    func locationManager(manager: CLLocationManager!, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
-        if status == .AuthorizedWhenInUse {
-            locationManager.startUpdatingLocation()
-            
-            mapView.myLocationEnabled = true
-            mapView.settings.myLocationButton = true
-        }
-    }
+    
     
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
+        
+        
+        println(manager.location.coordinate.latitude)
+        println(manager.location.coordinate.longitude)
+        
+        
         if let location = locations.first as? CLLocation {
-            var latValue = locationManager.location.coordinate.latitude
-            var lonValue = locationManager.location.coordinate.longitude
+            var latValue = manager.location.coordinate.latitude
+            var lonValue = manager.location.coordinate.longitude
             
             var lng:String = "\(lonValue)"
             var lat:String = "\(latValue)"
             coordLabel.text = lat + " " + lng
-            
             mapView.camera = GMSCameraPosition(target: location.coordinate, zoom: 15, bearing: 0, viewingAngle: 0)
             
             //will continually get location unless have this line
-            locationManager.stopUpdatingLocation()
+            manager.stopUpdatingLocation()
         }
     }
+    
+//
+//    func locationManager(manager: CLLocationManager!, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+//        if status == .AuthorizedWhenInUse {
+//            manager.startUpdatingLocation()
+//            println(manager.location.coordinate.latitude)
+//            println(manager.location.coordinate.longitude)
+//            
+//            mapView.myLocationEnabled = true
+//            mapView.settings.myLocationButton = true
+//        }
+//    }
+//
+
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
