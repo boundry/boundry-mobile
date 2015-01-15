@@ -45,7 +45,7 @@ class EventTableViewController: UITableViewController, UITableViewDelegate {
                 options: NSJSONReadingOptions.MutableContainers,
                 error:&parseError)
             
-            var eventsData = parsedObject as [AnyObject]
+            let eventsData = parsedObject as [AnyObject]
             eventsData[0].setValue("", forKey: "event_center")
             
             NSUserDefaults.standardUserDefaults().setObject(eventsData, forKey: "eventsData")
@@ -92,7 +92,7 @@ class EventTableViewController: UITableViewController, UITableViewDelegate {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("event", forIndexPath: indexPath) as UITableViewCell
 
-        cell.textLabel.text = eventsList[indexPath.row]
+        cell.textLabel!.text = eventsList[indexPath.row]
         cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
 
         return cell
@@ -150,7 +150,7 @@ class EventTableViewController: UITableViewController, UITableViewDelegate {
             var vc:ViewController = segue.destinationViewController as ViewController
             var selectedRowIndex = self.tableView.indexPathForSelectedRow()
             var currentCell = self.tableView.cellForRowAtIndexPath(selectedRowIndex!)
-            vc.eventName = currentCell!.textLabel.text!
+            vc.eventName = currentCell!.textLabel!.text!
             println(vc.eventName)
         }
     }

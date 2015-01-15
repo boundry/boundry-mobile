@@ -6,6 +6,16 @@
 //  Copyright (c) 2014 madebycaro. All rights reserved.
 //
 
+//left region
+//37.7873589
+//-122.421227
+
+//right
+//37.799889
+//-122.413327
+
+
+
 import UIKit
 
 class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate {    
@@ -54,7 +64,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                                 println(region)
                                 let regionName = region["region_name"] as NSString
                                 self.regionDict[regionName] = false
-                                
                                 if let regionAttr = region["region_attr"] as? [String: AnyObject]{
                                     if let coordinates = regionAttr["coordinates"] as? [AnyObject] {
                                         self.regions[regionName] = region
@@ -108,6 +117,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     //check which region the user is in
     func checkCurrentRegionIn() {
         for (regName, regionPath) in regionPathDict {
+            println("regPath")
             checkUserInBoundary(regionPath, regName: regName)
         }
     //go through all regions and do the checkUserInBoundary
@@ -116,17 +126,23 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     
     //checks if user in any of the boundaries. updates label
     func checkUserInBoundary(region: GMSMutablePath, regName: NSString) {
+        var regionId: String = ""
         if let latValue = locationManager.location.coordinate.latitude as CLLocationDegrees? {
             if let lonValue = locationManager.location.coordinate.longitude as CLLocationDegrees? {
-                println("setlatlon")
+//                println("setlatlon")
             }
         }
         var latValue = locationManager.location.coordinate.latitude
         var lonValue = locationManager.location.coordinate.longitude
+        for (regNa, regObj) in regions {
+            if (regNa == regName) {
+                regionId = String(regObj["id"] as NSInteger!)
+            }
+            
+        }
         
         //checks if current loc is in boundary
         if GMSGeometryContainsLocation(locationManager.location.coordinate, region, true) {
-            println("in here")
             coordLabel.text = "You are in: " + regName
             //if false, switch to true and change the previous true to false
             //reassign currentRegionIn
@@ -138,10 +154,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                 currentRegionIn = regName
                 //get notifications for (newly) entered region and shows notification
 //                var urlString = "http://boundry.herokuapp.com/api/mobile/actions/" + regName
-                println(regName)
-                var urlString = "http://localhost:8000/api/mobile/actions/" + "1"
-                let url = NSURL(string: urlString)
                 
+                var urlString = "http://localhost:8000/api/mobile/actions/" + regionId
+                let url = NSURL(string: urlString)
                 let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
                     
                     var parseError: NSError?
@@ -152,6 +167,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                     
                     //show notification that comes in for the event
                     if let notification = parsedObject[0] as? [String: AnyObject] {
+                        println(notification)
                         var alert = UIAlertController(title: notification["name"] as? String, message: notification["action_data"] as? String, preferredStyle: UIAlertControllerStyle.Alert)
                         alert.addAction(UIAlertAction(title: "Okay!", style: UIAlertActionStyle.Default, handler: nil))
                         self.presentViewController(alert, animated: true, completion: nil)
