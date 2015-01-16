@@ -52,10 +52,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
 
 //        getEventData(eventName)
     }
-
-    //get api event info and show regions on view
-//    @IBAction func getEventDataPressed(sender: AnyObject) {
-//    }
+    
     override func viewDidAppear(animated: Bool) {
         println("viewdidappear")
         getEventData(eventName)
@@ -129,21 +126,18 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     //check which region the user is in
     func checkCurrentRegionIn() {
         for (regName, regionPath) in regionPathDict {
-            println("regPath")
             checkUserInBoundary(regionPath, regName: regName)
         }
-    //go through all regions and do the checkUserInBoundary
-        //if diff switch true and false and then do get request to server
     }
     
     //checks if user in any of the boundaries. updates label
     func checkUserInBoundary(region: GMSMutablePath, regName: NSString) {
         var regionId: String = ""
-        if let latValue = locManager.location.coordinate.latitude as CLLocationDegrees? {
-            if let lonValue = locManager.location.coordinate.longitude as CLLocationDegrees? {
-//                println("setlatlon")
-            }
+
+        if locManager.location == nil {
+            return
         }
+        
         var latValue = locManager.location.coordinate.latitude
         var lonValue = locManager.location.coordinate.longitude
         for (regNa, regObj) in regions {
@@ -166,7 +160,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                 //get notifications for (newly) entered region and shows notification
 //                var urlString = "http://boundry.herokuapp.com/api/mobile/actions/" + regName
                 
-                var urlString = "http://localhost:8000/api/mobile/actions/" + regionId
+                var urlString = "http://10.8.16.232:8000/api/mobile/actions/" + regionId
                 let url = NSURL(string: urlString)
                 let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
                     
@@ -191,11 +185,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     
     
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
-        
-        
-        println(manager.location.coordinate.latitude)
-        println(manager.location.coordinate.longitude)
-        
+//        println(manager.location.coordinate.latitude)
+//        println(manager.location.coordinate.longitude)
         
         if let location = locations.first as? CLLocation {
             var latValue = manager.location.coordinate.latitude
@@ -211,30 +202,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         }
     }
     
-//
-//    func locationManager(manager: CLLocationManager!, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
-//        if status == .AuthorizedWhenInUse {
-//            manager.startUpdatingLocation()
-//            println(manager.location.coordinate.latitude)
-//            println(manager.location.coordinate.longitude)
-//            
-//            mapView.myLocationEnabled = true
-//            mapView.settings.myLocationButton = true
-//        }
-//    }
-//
-
-    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
 
 }
-
-//        set timeout
-//        let delayTime = 2 * Double(NSEC_PER_SEC)
-//        let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delayTime))
-//        dispatch_after(time, dispatch_get_main_queue()) { () -> Void in
-//            println("hi")
-//        }

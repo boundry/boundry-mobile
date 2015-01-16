@@ -35,7 +35,7 @@ class EventTableViewController: UITableViewController, UITableViewDelegate {
     //gets events data from server and saves to userdefaults
     func fetchEventsData() {
 //        let url = NSURL(string: "http://boundry.herokuapp.com/api/mobile/events")
-        let url = NSURL(string: "http://localhost:8000/api/mobile/events")
+        let url = NSURL(string: "http://10.8.16.232:8000/api/mobile/events")
 
         let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
             
@@ -92,7 +92,7 @@ class EventTableViewController: UITableViewController, UITableViewDelegate {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("event", forIndexPath: indexPath) as UITableViewCell
 
-        cell.textLabel!.text = eventsList[indexPath.row]
+        cell.textLabel.text = eventsList[indexPath.row]
         cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
 
         return cell
@@ -150,7 +150,7 @@ class EventTableViewController: UITableViewController, UITableViewDelegate {
             var vc:ViewController = segue.destinationViewController as ViewController
             var selectedRowIndex = self.tableView.indexPathForSelectedRow()
             var currentCell = self.tableView.cellForRowAtIndexPath(selectedRowIndex!)
-            vc.eventName = currentCell!.textLabel!.text!
+            vc.eventName = currentCell!.textLabel.text!
             println(vc.eventName)
         }
     }
