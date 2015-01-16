@@ -39,15 +39,18 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Vdc-kh-DaT">
-                                <rect key="frame" x="319" y="72" width="46" height="30"/>
-                                <state key="normal" title="Button">
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Vdc-kh-DaT" userLabel="ReloadButton">
+                                <rect key="frame" x="305" y="68" width="54" height="30"/>
+                                <state key="normal" title="Reload">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <action selector="reloadData" destination="BYZ-38-t0r" eventType="touchUpInside" id="oCx-wd-lJH"/>
                                 </connections>
                             </button>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="f2F-iw-6ft" userLabel="ReloadSpinner">
+                                <rect key="frame" x="283" y="72" width="20" height="20"/>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
@@ -68,6 +71,8 @@
                         <outlet property="eventNameLabel" destination="vOn-Sn-rbT" id="zrC-1z-ZNU"/>
                         <outlet property="mapView" destination="fTb-TE-k4v" id="3DZ-hA-W5K"/>
                         <outlet property="regionNameLabel" destination="7Oc-Wl-NrN" id="e5Z-AK-idG"/>
+                        <outlet property="reloadButton" destination="Vdc-kh-DaT" id="FV5-bY-J0u"/>
+                        <outlet property="reloadSpinner" destination="f2F-iw-6ft" id="3r8-BY-IK8"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
