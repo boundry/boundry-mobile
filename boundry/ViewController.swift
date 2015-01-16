@@ -39,7 +39,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     @IBOutlet var regionNameLabel: UILabel!
     @IBOutlet var coordLabel: UILabel!
     
+    @IBOutlet var reloadButton: UIButton!
+    @IBOutlet var reloadSpinner: UIActivityIndicatorView!
+    
     @IBAction func reloadData() {
+        self.reloadSpinner.hidden = false
+        self.reloadSpinner.startAnimating()
+        
         let url = NSURL(string: "http://10.8.16.232:8000/api/mobile/events")
         
         let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
@@ -58,6 +64,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
             
             dispatch_async(dispatch_get_main_queue(), {
                 self.mapView.clear()
+                self.reloadSpinner.stopAnimating()
             })
             
             self.getEventData(self.eventName)
@@ -74,7 +81,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         mapView.delegate = self
         mapView.myLocationEnabled = true
         mapView.settings.myLocationButton = true
-        
 
 //        getEventData(eventName)
     }
