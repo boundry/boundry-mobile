@@ -39,6 +39,32 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     @IBOutlet var regionNameLabel: UILabel!
     @IBOutlet var coordLabel: UILabel!
     
+    @IBAction func reloadData() {
+        let url = NSURL(string: "http://10.8.16.232:8000/api/mobile/events")
+        
+        let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
+            
+            var parseError: NSError?
+            //AnyObject! gets rid of the Optional Wrapping
+            let parsedObject: AnyObject! = NSJSONSerialization.JSONObjectWithData(data,
+                options: NSJSONReadingOptions.MutableContainers,
+                error:&parseError)
+            
+            let eventsData = parsedObject as [AnyObject]
+            eventsData[0].setValue("", forKey: "event_center")
+            
+            NSUserDefaults.standardUserDefaults().setObject(eventsData, forKey: "eventsData")
+            NSUserDefaults.standardUserDefaults().synchronize()
+            
+            dispatch_async(dispatch_get_main_queue(), {
+                self.mapView.clear()
+            })
+            
+            self.getEventData(self.eventName)
+        }
+        task.resume()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         var timer = NSTimer.scheduledTimerWithTimeInterval(2, target: self, selector: Selector("checkCurrentRegionIn"), userInfo: nil, repeats: true)
@@ -65,16 +91,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                     if eventName == evName {
                         if let regions = event["regions"] as? [AnyObject] {
                             for region in regions {
-                                println("REGION")
-                                println(region)
                                 let regionName = region["region_name"] as NSString
                                 self.regionDict[regionName] = false
                                 if let regionAttr = region["region_attr"] as? [String: AnyObject]{
                                     if let coordinates = regionAttr["coordinates"] as? [AnyObject] {
-                                        println("CC",coordinates)
                                         self.regions[regionName] = region
                                         dispatch_async(dispatch_get_main_queue(), {
-                                            println("dispatch")
                                             self.eventNameLabel.text = eventName
                                             self.showRegion(coordinates, regName: regionName)
                                         })
@@ -109,9 +131,18 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         checkUserInBoundary(regionPath, regName: regName)
         
         var polygon = GMSPolygon(path: regionPath)
-        polygon.strokeColor = UIColor.blackColor()
-        polygon.strokeWidth = 2
-        polygon.fillColor = UIColor.redColor().colorWithAlphaComponent(0.3)
+        
+        //set the fill of the polygon
+        var fill = regions[regName]?["region_attr"]??["fill"]?? as [String: AnyObject]
+        polygon.fillColor = colorWithHexString(fill["color"] as String)
+        polygon.fillColor = polygon.fillColor.colorWithAlphaComponent(fill["opacity"] as CGFloat)
+        
+        //set the stroke of the polygon
+        var stroke = regions[regName]?["region_attr"]??["stroke"]?? as [String: AnyObject]
+        polygon.strokeColor = colorWithHexString(stroke["color"] as String)
+        polygon.strokeColor = polygon.strokeColor.colorWithAlphaComponent(stroke["opacity"] as CGFloat)
+        polygon.strokeWidth = stroke["weight"] as CGFloat
+        
         polygon.map = self.mapView
         polygon.title = regName
         polygon.tappable = true
@@ -205,6 +236,28 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func colorWithHexString (hex:String) -> UIColor {
+        var cString:String = hex.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet() as NSCharacterSet).uppercaseString
+        
+        if (cString.hasPrefix("#")) {
+            cString = cString.substringFromIndex(advance(cString.startIndex, 1))
+        }
+        
+        if (countElements(cString) != 6) {
+            return UIColor.grayColor()
+        }
+        
+        var rgbValue:UInt32 = 0
+        NSScanner(string: cString).scanHexInt(&rgbValue)
+        
+        return UIColor(
+            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+            alpha: CGFloat(1.0)
+        )
     }
 
 }
