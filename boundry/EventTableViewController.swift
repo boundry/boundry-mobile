@@ -29,7 +29,25 @@ class EventTableViewController: UITableViewController, UITableViewDelegate {
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    }
+    
+    func removeNullsInJSON(json: AnyObject) {
+        if var array = json as? NSMutableArray {
+            for value in array {
+                self.removeNullsInJSON(value)
+            }
+        }
+        
+        if var dictionary = json as? NSMutableDictionary {
+            for (key, value) in dictionary {
+                if value is NSNull {
+                    dictionary.setValue("", forKey: key as String)
+                    continue
+                }
+                
+                self.removeNullsInJSON(value)
+            }
+        }
     }
     
     //gets events data from server and saves to userdefaults
@@ -45,9 +63,13 @@ class EventTableViewController: UITableViewController, UITableViewDelegate {
                 options: NSJSONReadingOptions.MutableContainers,
                 error:&parseError)
             
-            let eventsData = parsedObject as [AnyObject]
-            eventsData[0].setValue("", forKey: "event_center")
+            if parsedObject == nil {
+                return
+            }
             
+            let eventsData = parsedObject as NSMutableArray
+            
+            self.removeNullsInJSON(eventsData)
             NSUserDefaults.standardUserDefaults().setObject(eventsData, forKey: "eventsData")
             NSUserDefaults.standardUserDefaults().synchronize()
             
