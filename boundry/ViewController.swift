@@ -24,6 +24,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     
     // gets eventName from EventTableViewController
     var eventName = ""
+    var reloading = false
     
     // generates uniqueId for each phone
     let uniqueId = UIDevice.currentDevice().identifierForVendor.UUIDString
@@ -43,8 +44,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     @IBOutlet var reloadSpinner: UIActivityIndicatorView!
     
     @IBAction func reloadData() {
+        if (reloading) {
+            return
+        }
+        
         self.reloadSpinner.hidden = false
         self.reloadSpinner.startAnimating()
+        self.reloading = true
+        
+        self.regionPathDict.removeAll(keepCapacity: false)
+        self.regionDict.removeAll(keepCapacity: false)
+        self.regions.removeAll(keepCapacity: false)
         
         let url = NSURL(string: "http://10.8.16.232:8000/api/mobile/events")
         
@@ -56,8 +66,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                 options: NSJSONReadingOptions.MutableContainers,
                 error:&parseError)
             
-            let eventsData = parsedObject as [AnyObject]
-            eventsData[0].setValue("", forKey: "event_center")
+            if parsedObject == nil {
+                return
+            }
+            
+            let eventsData = parsedObject as NSMutableArray
+            self.removeNullsInJSON(eventsData)
+            
             
             NSUserDefaults.standardUserDefaults().setObject(eventsData, forKey: "eventsData")
             NSUserDefaults.standardUserDefaults().synchronize()
@@ -68,26 +83,44 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
             })
             
             self.getEventData(self.eventName)
+            self.reloading = false
         }
         task.resume()
+    }
+    
+    func removeNullsInJSON(json: AnyObject) {
+        if var array = json as? NSMutableArray {
+            for value in array {
+                self.removeNullsInJSON(value)
+            }
+        }
+        
+        if var dictionary = json as? NSMutableDictionary {
+            for (key, value) in dictionary {
+                if value is NSNull {
+                    dictionary.setValue("", forKey: key as String)
+                    continue
+                }
+                
+                self.removeNullsInJSON(value)
+            }
+        }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         var timer = NSTimer.scheduledTimerWithTimeInterval(2, target: self, selector: Selector("checkCurrentRegionIn"), userInfo: nil, repeats: true)
+        self.title = self.eventName
         locManager.delegate = self
-        locManager.requestWhenInUseAuthorization()
+//        locManager.requestWhenInUseAuthorization()
         locManager.startUpdatingLocation()
         mapView.delegate = self
         mapView.myLocationEnabled = true
         mapView.settings.myLocationButton = true
-
-//        getEventData(eventName)
     }
     
     override func viewDidAppear(animated: Bool) {
-        println("viewdidappear")
-        getEventData(eventName)
+        self.reloadData()
     }
     
     func getEventData(evName: String) {
@@ -103,7 +136,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                                     if let coordinates = regionAttr["coordinates"] as? [AnyObject] {
                                         self.regions[regionName] = region
                                         dispatch_async(dispatch_get_main_queue(), {
-                                            self.eventNameLabel.text = eventName
+                                            self.title = eventName
                                             self.showRegion(coordinates, regName: regionName)
                                         })
                                     }
@@ -132,8 +165,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         
         self.regionPathDict[regName] = regionPath
         
-        var test = locManager
-        NSLog("in here, %@", test)
         checkUserInBoundary(regionPath, regName: regName)
         
         var polygon = GMSPolygon(path: regionPath)
@@ -208,14 +239,27 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                         error:&parseError)
                     
                     //show notification that comes in for the event
-                    if let notification = parsedObject[0] as? [String: AnyObject] {
-                        println(notification)
-                        var alert = UIAlertController(title: notification["name"] as? String, message: notification["action_data"] as? String, preferredStyle: UIAlertControllerStyle.Alert)
-                        alert.addAction(UIAlertAction(title: "Okay!", style: UIAlertActionStyle.Default, handler: nil))
-                        self.presentViewController(alert, animated: true, completion: nil)
+                    if parsedObject != nil {
+                        if let notification = parsedObject[0] as? [String: AnyObject] {
+                            if let title = notification["name"] as? String {
+                                if let message = notification["action_data"] as? String {                                    
+                                    var alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
+                                    alert.addAction(UIAlertAction(title: "Okay!", style: UIAlertActionStyle.Default, handler: nil))
+                                    self.presentViewController(alert, animated: true, completion: nil)
+                                    
+                                    self.regionDict[regName] = true
+
+                                }
+                            }
+                        }
                     }
                 }
                 task.resume()
+            }
+        } else {
+            if regName == self.currentRegionIn {
+                self.currentRegionIn = "Not currently in a region"
+                self.coordLabel.text = "Not currently in a region"
             }
         }
     }
@@ -231,7 +275,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
             
             var lng:String = "\(lonValue)"
             var lat:String = "\(latValue)"
-            coordLabel.text = lat + " " + lng
+//            coordLabel.text = lat + " " + lng
             mapView.camera = GMSCameraPosition(target: location.coordinate, zoom: 15, bearing: 0, viewingAngle: 0)
             
             //will continually get location unless have this line
@@ -265,5 +309,4 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
             alpha: CGFloat(1.0)
         )
     }
-
 }
