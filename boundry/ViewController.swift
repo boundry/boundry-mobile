@@ -110,19 +110,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     override func viewDidLoad() {
         super.viewDidLoad()
         var timer = NSTimer.scheduledTimerWithTimeInterval(2, target: self, selector: Selector("checkCurrentRegionIn"), userInfo: nil, repeats: true)
+        self.title = self.eventName
         locManager.delegate = self
-        locManager.requestWhenInUseAuthorization()
+//        locManager.requestWhenInUseAuthorization()
         locManager.startUpdatingLocation()
         mapView.delegate = self
         mapView.myLocationEnabled = true
         mapView.settings.myLocationButton = true
-
-//        getEventData(eventName)
     }
     
     override func viewDidAppear(animated: Bool) {
-        println("viewdidappear")
-        getEventData(eventName)
+        self.reloadData()
     }
     
     func getEventData(evName: String) {
@@ -138,7 +136,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                                     if let coordinates = regionAttr["coordinates"] as? [AnyObject] {
                                         self.regions[regionName] = region
                                         dispatch_async(dispatch_get_main_queue(), {
-                                            self.eventNameLabel.text = eventName
+                                            self.title = eventName
                                             self.showRegion(coordinates, regName: regionName)
                                         })
                                     }
@@ -243,15 +241,25 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                     //show notification that comes in for the event
                     if parsedObject != nil {
                         if let notification = parsedObject[0] as? [String: AnyObject] {
-                            var alert = UIAlertController(title: notification["name"] as? String, message: notification["action_data"] as? String, preferredStyle: UIAlertControllerStyle.Alert)
-                            alert.addAction(UIAlertAction(title: "Okay!", style: UIAlertActionStyle.Default, handler: nil))
-                            self.presentViewController(alert, animated: true, completion: nil)
-                            
-                            self.regionDict[regName] = true
+                            if let title = notification["name"] as? String {
+                                if let message = notification["action_data"] as? String {                                    
+                                    var alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
+                                    alert.addAction(UIAlertAction(title: "Okay!", style: UIAlertActionStyle.Default, handler: nil))
+                                    self.presentViewController(alert, animated: true, completion: nil)
+                                    
+                                    self.regionDict[regName] = true
+
+                                }
+                            }
                         }
                     }
                 }
                 task.resume()
+            }
+        } else {
+            if regName == self.currentRegionIn {
+                self.currentRegionIn = "Not currently in a region"
+                self.coordLabel.text = "Not currently in a region"
             }
         }
     }
@@ -267,7 +275,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
             
             var lng:String = "\(lonValue)"
             var lat:String = "\(latValue)"
-            coordLabel.text = lat + " " + lng
+//            coordLabel.text = lat + " " + lng
             mapView.camera = GMSCameraPosition(target: location.coordinate, zoom: 15, bearing: 0, viewingAngle: 0)
             
             //will continually get location unless have this line
@@ -301,5 +309,4 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
             alpha: CGFloat(1.0)
         )
     }
-
 }
