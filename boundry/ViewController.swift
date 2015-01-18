@@ -56,7 +56,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         self.regionDict.removeAll(keepCapacity: false)
         self.regions.removeAll(keepCapacity: false)
         
-        let url = NSURL(string: "http://10.8.16.232:8000/api/mobile/events")
+        let url = NSURL(string: "http://boundry.herokuapp.com/api/mobile/events")
         
         let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
             
@@ -226,9 +226,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                 }
                 currentRegionIn = regName
                 //get notifications for (newly) entered region and shows notification
-//                var urlString = "http://boundry.herokuapp.com/api/mobile/actions/" + regName
                 
-                var urlString = "http://10.8.16.232:8000/api/mobile/actions/" + regionId
+                var urlString = "http://boundry.herokuapp.com/api/mobile/actions/" + regionId
                 let url = NSURL(string: urlString)
                 let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
                     
