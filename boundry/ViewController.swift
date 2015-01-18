@@ -43,11 +43,28 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     @IBOutlet var reloadButton: UIButton!
     @IBOutlet var reloadSpinner: UIActivityIndicatorView!
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        var timer = NSTimer.scheduledTimerWithTimeInterval(2, target: self, selector: Selector("checkCurrentRegionIn"), userInfo: nil, repeats: true)
+        self.title = self.eventName
+        locManager.delegate = self
+        locManager.startUpdatingLocation()
+        mapView.delegate = self
+        mapView.myLocationEnabled = true
+        mapView.settings.myLocationButton = true
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        self.reloadData()
+    }
+    
+    
     @IBAction func reloadData() {
         if (reloading) {
             return
         }
-        
+        self.coordLabel.alpha = 0.7
+        self.reloadButton.alpha = 0.8
         self.reloadSpinner.hidden = false
         self.reloadSpinner.startAnimating()
         self.reloading = true
@@ -105,22 +122,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                 self.removeNullsInJSON(value)
             }
         }
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        var timer = NSTimer.scheduledTimerWithTimeInterval(2, target: self, selector: Selector("checkCurrentRegionIn"), userInfo: nil, repeats: true)
-        self.title = self.eventName
-        locManager.delegate = self
-//        locManager.requestWhenInUseAuthorization()
-        locManager.startUpdatingLocation()
-        mapView.delegate = self
-        mapView.myLocationEnabled = true
-        mapView.settings.myLocationButton = true
-    }
-    
-    override func viewDidAppear(animated: Bool) {
-        self.reloadData()
     }
     
     func getEventData(evName: String) {

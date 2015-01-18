@@ -13,9 +13,12 @@ class EventTableViewController: UITableViewController, UITableViewDelegate {
     var eventsList = [String]()
 
     override func viewDidLoad() {
+    
         super.viewDidLoad()
         title = "Events"
-        
+        self.navigationController?.navigationBar.titleTextAttributes = [ NSForegroundColorAttributeName:UIColor.whiteColor(),
+            NSFontAttributeName: UIFont(name: "Avenir-Medium", size:18)!]
+        self.navigationController?.navigationBar.barTintColor = UIColorFromHex(0x4E5B69)
         updateEventsList()
         fetchEventsData()
     }
@@ -58,7 +61,6 @@ class EventTableViewController: UITableViewController, UITableViewDelegate {
             if parsedObject == nil {
                 return
             }
-            
             let eventsData = parsedObject as NSMutableArray
             
             self.removeNullsInJSON(eventsData)
@@ -88,6 +90,14 @@ class EventTableViewController: UITableViewController, UITableViewDelegate {
             self.tableView.reloadData()
         }
     }
+    
+    func UIColorFromHex(rgbValue:UInt32)->UIColor {
+        let red = CGFloat((rgbValue & 0xFF0000) >> 16)/256.0
+        let green = CGFloat((rgbValue & 0xFF00) >> 8)/256.0
+        let blue = CGFloat(rgbValue & 0xFF)/256.0
+        return UIColor(red:red, green:green, blue:blue, alpha:1.0)
+    }
+    
 
     // MARK: - Table view data source
 
@@ -105,8 +115,8 @@ class EventTableViewController: UITableViewController, UITableViewDelegate {
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("event", forIndexPath: indexPath) as UITableViewCell
-
-        cell.textLabel.text = eventsList[indexPath.row]
+        cell
+        cell.textLabel!.text = eventsList[indexPath.row]
         cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
 
         return cell
@@ -117,7 +127,7 @@ class EventTableViewController: UITableViewController, UITableViewDelegate {
             var vc:ViewController = segue.destinationViewController as ViewController
             var selectedRowIndex = self.tableView.indexPathForSelectedRow()
             var currentCell = self.tableView.cellForRowAtIndexPath(selectedRowIndex!)
-            vc.eventName = currentCell!.textLabel.text!
+            vc.eventName = currentCell!.textLabel!.text!
         }
     }
 }
